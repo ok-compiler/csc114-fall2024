@@ -3,4 +3,5 @@
 
 int title_screen();
 int opening_monologue();
+int ui();
 #endif

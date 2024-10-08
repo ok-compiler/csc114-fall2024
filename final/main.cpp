@@ -4,6 +4,8 @@
 using namespace std;
 int title_input = -1;
 int main() {
+ui();
+/*
 	title_screen();
 	cout << "Type the number for the corresponding option:\n1 - Continue\n2 - New Game" << endl;
 	while (title_input == -1) {
@@ -25,6 +27,6 @@ int main() {
 			title_input = -1;
 			break;
 		}
-	}
+	}*/
 	return 0;
 }
