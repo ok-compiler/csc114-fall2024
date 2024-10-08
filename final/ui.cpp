@@ -1,4 +1,6 @@
 #include <iostream>
+#include <fstream>
+#include <string>
 #include "engine.h" // game engine file
 //#include "info.h" // info/data for enemies, items, buffs, etc
 using namespace std;
@@ -13,21 +15,23 @@ const int mapY = 25;
 char map[mapY][mapX]; // map interface
 int inBattle = 0;
 char wasd;
-
+int mapNumber = 23;
 void mapInit() {
-	for(int y = 0; y < mapY; y++){ //for each mapY value
-		for(int x = 0; x < mapX; x++){ // and then each mapX value
-			if (x == mapX - 1 || x == 0) { // if x value is 0 or 99, set border
-				map[y][x] = '#';
-			}
-			else if (y == mapY - 1 || y == 0) { // if y value is 0 or 99, set border
-				map[y][x] = '#';
-			}
-			else {
-				map[y][x] = '.';
+	ifstream file("map/chapter1/" + to_string(mapNumber) + ".txt");
+	 if (!file.is_open()) {
+        // print error message and return
+        cerr << "failed to open file" << endl;
+    	}
+	string line;
+	
+		for(int y = 0; y < mapY; y++){
+			for(int x = 0; x < mapX; x++) {
+				if (!map[y][x]) {
+					file >> map[y][x];
+				}
 			}
 		}
-	}
+	file.close();
 }
 
 void updatePlayer(int init) {
@@ -40,7 +44,7 @@ void updatePlayer(int init) {
 		cin >> wasd;
 		switch(wasd) {
 			case 'w': 
-				playerY--; 
+				newplayerY--; 
 			break;
 			case 'a': 
 				newplayerX--; 
@@ -53,10 +57,11 @@ void updatePlayer(int init) {
 			break;
 		}
 		if (map[newplayerY][newplayerX] != '#') {
+		map[playerY][playerX] = '.';
+		map[newplayerY][newplayerX] = '@';
 		playerX = newplayerX;
 		playerY = newplayerY;
 		}
-		map[playerY][playerX] = '@';
 	}
 }
 
