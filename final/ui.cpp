@@ -15,9 +15,12 @@ const int mapY = 25;
 char map[mapY][mapX]; // map interface
 int inBattle = 0;
 char wasd;
-int mapNumber = 23;
+int locX = 2;
+int locY = 0;
+
 void mapInit() {
-	ifstream file("map/chapter1/" + to_string(mapNumber) + ".txt");
+	cout << locX << locY << endl;
+	ifstream file("map/chapter1/" + to_string(locX) + to_string(locY) + ".txt");
 	 if (!file.is_open()) {
         // print error message and return
         cerr << "failed to open file" << endl;
@@ -26,9 +29,7 @@ void mapInit() {
 	
 		for(int y = 0; y < mapY; y++){
 			for(int x = 0; x < mapX; x++) {
-				if (!map[y][x]) {
 					file >> map[y][x];
-				}
 			}
 		}
 	file.close();
@@ -44,16 +45,36 @@ void updatePlayer(int init) {
 		cin >> wasd;
 		switch(wasd) {
 			case 'w': 
-				newplayerY--; 
+				if (newplayerY == 0) {
+					newplayerY = 24;
+					locY++;
+					mapInit();
+				}
+				else newplayerY--; 
 			break;
 			case 'a': 
-				newplayerX--; 
+				if (newplayerX == 0) {
+					newplayerX = 49;
+					locX--;
+					mapInit();
+				}
+				else newplayerX--; 
 			break;	
 			case 's': 
-				newplayerY++; 
+				if (newplayerY == 24) {
+					newplayerY = 0;
+					locY--;
+					mapInit();
+				}
+				else newplayerY++; 
 			break;
 			case 'd': 
-				newplayerX++; 
+				if (newplayerX == 49) {
+					newplayerX = 0;
+					locX++;
+					mapInit();
+				}
+				else newplayerX++; 
 			break;
 		}
 		if (map[newplayerY][newplayerX] != '#') {
