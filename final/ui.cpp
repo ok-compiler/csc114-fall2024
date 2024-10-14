@@ -27,6 +27,7 @@ int locX = 2;
 int locY = 0;
 bool newm;
 
+//initializes map
 void mapInit() {
 	cout << locX << locY << endl;
 	ifstream file("map/chapter1/" + to_string(locX) + to_string(locY) + ".txt");
@@ -44,6 +45,7 @@ void mapInit() {
 	file.close();
 }
 
+//updates player position within map
 void updatePlayer(int init) {
 	int newplayerX = playerX;
 	int newplayerY = playerY;
@@ -116,6 +118,37 @@ void updatePlayer(int init) {
 	}
 }
 
+//updates enemy position
+void updateEnem() {
+	while(true) {
+		auto time = system_clock::now().time_since_epoch() / 1ms;
+		cout << time << endl;
+		time ^= time << 13;
+    		time ^= time >> 17;
+    		time ^= time << 5;
+    		time ^= time << 9;
+    		cout << time << endl;
+    		time %= 4;
+    		switch(abs(time)) {
+    			case 0:
+    				cout << "left" << endl;
+    			break;
+    			case 1:
+    				cout << "right" << endl;
+    			break;
+    			case 2:
+    				cout << "up" << endl;
+    			break;
+    			case 3:
+    				cout << "down" << endl;	
+    			break;
+    		}
+		sleep_for(1s);
+	}
+	
+}
+
+//clears console and prints map output (very inefficiently lol)
 void printMap(){
 	char minimap[5][5];
 
@@ -155,14 +188,17 @@ void printMap(){
     }
 }
 
+// main ui function (literally just executes all the other functions)
 int ui() {
-	mapInit();
+	updateEnem();
+	
+	/*mapInit();
 	updatePlayer(0);
 	printMap();
 	while(true) {
 		mapInit();
 		updatePlayer(1);
 		printMap();
-	}
+	}*/
 	return 0;
 }
