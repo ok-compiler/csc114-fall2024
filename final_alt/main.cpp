@@ -4,6 +4,9 @@
 #include <string>
 using namespace std;
 
+#include <mutex> // mutes threads so my map doesnt break
+mutex mapMutex;
+
 // time/sleep_for() stuff
 #include <chrono>
 #include <thread>
@@ -16,7 +19,9 @@ int pieceX[4] = {10, 11, 12, 13};
 int pieceY[4] = {2, 2, 2, 2};
 int newpieceX[4];
 int newpieceY[4];
+int newpieceY_delay[4];
 int pieceValue = 0;
+int collisionCheck;
 
 // map values
 const int mapX = 25;
@@ -30,105 +35,18 @@ char wasd;
 void mapInit() {
 	for(int y = 0; y < mapY; y++){ //for each mapY value
 		for(int x = 0; x < mapX; x++){ // and then each mapX value
-			if (x == mapX - 1 || x == 0) { // if x value is 0 or 99, set border
-				map[y][x] = '#';
-			}
-			else if (y == mapY - 1 || y == 0) { // if y value is 0 or 99, set border
-				map[y][x] = '#';
-			}
-			else {
-				map[y][x] = '.';
-			}
+				if (x == mapX - 1 || x == 0) { // if x value is 0 or 99, set border
+					map[y][x] = '#';
+				}
+				else if (y == mapY - 1 || y == 0) { // if y value is 0 or 99, set border
+					map[y][x] = '#';
+				}
+				else {
+					map[y][x] = '.';
+				}
 		}
 	}
 }
-
-//updates player position within map
-void updatePiece(int init) {
-	for(int i = 0; i < 4; i++) {
-		newpieceX[i] = pieceX[i];
-		newpieceY[i] = pieceY[i];
-	}
-	
-	if (init == 0) {
-		map[pieceY[0]][pieceX[0]] = '@';
-		map[pieceY[1]][pieceX[1]] = '@';
-		map[pieceY[2]][pieceX[2]] = '@';
-		map[pieceY[3]][pieceX[3]] = '@';
-		
-	}
-	/*else {
-		if (wasd != '~') system("stty raw"); 
-		wasd = getchar(); 
-		switch(wasd) {
-			case 'w': 
-				if (newplayerY == 0) {
-					newm = true;
-					newplayerY = 24;
-					locY++;
-					mapInit();
-				}
-				else {
-					newm = false;
-					newplayerY--;
-				}
-			break;
-			case 'a': 
-				if (newplayerX == 0) {
-					newm = true;
-					newplayerX = 49;
-					locX--;
-					mapInit();
-				}
-				else {
-					newm = false;
-					newplayerX--; 
-				}
-			break;	
-			case 's': 
-				if (newplayerY == 24) {
-					newm = true;
-					newplayerY = 0;
-					locY--;
-					mapInit();
-				}
-				else {
-					newm = false;
-					newplayerY++; 
-				}
-			break;
-			case 'd': 
-				if (newplayerX == 49) {
-					newm = true;
-					newplayerX = 0;
-					locX++;
-					mapInit();
-				}
-				else {
-					newm = false;
-					newplayerX++;
-				} 
-			break;
-			case '~':
-			system("stty cooked");
-			break;
-		}
-		system("stty cooked");
-		if (map[newplayerY][newplayerX] != '#') {
-			
-			playerX = newplayerX;
-			playerY = newplayerY;
-			map[playerY][playerX] = '@';
-		} else map[playerY][playerX] = '@';
-	}*/
-}
-
-void updatePos() {
-	for(int i = 0; i < 4; i++){
-		//pieceY[i];
-	}
-}
-
 
 //initializes next piece w/ "random" number generator
 int initPiece() {
@@ -142,31 +60,31 @@ int initPiece() {
     	time %= 7;
     	switch(abs(time)) {
     		case 0:
-    			std::cout << "T piece" << std::endl;
+    			cout << "T piece" << endl;
     			return 0;
     		break;
     		case 1:
-    			std::cout << "L piece" << std::endl;
+    			cout << "L piece" << endl;
     			return 1;
     		break;
     		case 2:
-    			std::cout << "I piece" << std::endl;
+    			cout << "I piece" << std::endl;
     			return 2;
     		break;
     		case 3:
-    			std::cout << "J piece" << std::endl;
+    			cout << "J piece" << endl;
     			return 3;
     		break;
     		case 4:
-    			std::cout << "Z piece" << std::endl;
+    			cout << "Z piece" << endl;
     			return 4;
     		break;
     		case 5:
-    			std::cout << "R piece" << std::endl;
+    			cout << "R piece" << endl;
     			return 5;
     		break;
     		case 6:
-    			std::cout << "square piece" << std::endl;
+    			cout << "square piece" << endl;
     			return 6;
     		break;
     		
@@ -174,29 +92,131 @@ int initPiece() {
 	return 0;
 }
 
-//clears console and prints map output
+//clears console and prints new map
 void printMap(){
 	system("clear");
 	for(int y = 0; y < mapY; y++){ //for each mapX value
 		for(int x = 0; x < mapX; x++){ // and then each mapY value
-			if (x == mapX - 1) std::cout << map[y][x] << std::endl;
-			else std::cout << map[y][x];
+			if (x == mapX - 1) cout << map[y][x] << endl;
+			else cout << map[y][x];
 		}
 	}
 }
+
+//updates player position within map
+void updatePiece(int init) {
+	for(int i = 0; i < 4; i++) {
+		newpieceX[i] = pieceX[i];
+		newpieceY[i] = pieceY[i];
+	}
+	
+	if (init == 0) {
+		for(int i = 0; i < 4; i++) {
+		map[pieceY[i]][pieceX[i]] = '@';
+		}
+	}
+	else {
+		if (wasd != '~') system("stty raw"); 
+		wasd = getchar(); 
+		switch(wasd) {
+			case 'w': 
+				
+			break;
+			case 'a': 
+				for(int i = 0; i < 4; i++) {
+					newpieceX[i]--;
+					if (map[newpieceY[i]][newpieceX[i]] != '#') { 
+						collisionCheck++;
+					}
+				}
+				if (collisionCheck == 4) {
+					for(int i = 0; i < 4; i++) {
+						pieceX[i] = newpieceX[i];
+						pieceY[i] = newpieceY[i];
+						map[pieceY[i]][pieceX[i]] = '@';
+						printMap();
+					}
+				}
+			break;	
+			case 's': 
+				for(int i = 0; i < 4; i++) {
+					newpieceY[i]++;
+					if (map[newpieceY[i]][newpieceX[i]] != '#') { 
+						collisionCheck++;
+					}
+				}
+				if (collisionCheck == 4) {
+					for(int i = 0; i < 4; i++) {
+						pieceX[i] = newpieceX[i];
+						pieceY[i] = newpieceY[i];
+						map[pieceY[i]][pieceX[i]] = '@';
+						printMap();
+					}
+				}
+			break;
+			case 'd': 
+				for(int i = 0; i < 4; i++) {
+					newpieceX[i]++;
+					if (map[newpieceY[i]][newpieceX[i]] != '#') { 
+						collisionCheck++;
+					}
+				}
+				if (collisionCheck == 4) {
+					for(int i = 0; i < 4; i++) {
+						pieceX[i] = newpieceX[i];
+						pieceY[i] = newpieceY[i];
+						map[pieceY[i]][pieceX[i]] = '@';
+						printMap();
+					}
+				}
+			break;
+			case '~':
+			system("stty cooked");
+			break;
+		}
+		collisionCheck = 0;
+		system("stty cooked");
+	}
+}
+
+void updatePos() {
+	int collisionCheck_delay;
+	while(true) {
+	for(int i = 0; i < 4; i++) {
+		newpieceY_delay[i] = pieceY[i];
+	}
+	for(int i = 0; i < 4; i++) {
+		newpieceY_delay[i]++;
+		if (map[newpieceY_delay[i]][pieceX[i]] != '#') { 
+			collisionCheck_delay++;
+		}
+	}
+	if (collisionCheck_delay == 4) {
+		for(int i = 0; i < 4; i++) {
+			pieceY[i] = newpieceY_delay[i];
+			map[pieceY[i]][pieceX[i]] = '@';
+			printMap();
+		}
+	}
+	collisionCheck_delay = 0;
+	//printMap();
+	sleep_for(1s);
+	}
+}
+
+
 
 // main ui function (literally just executes all the other functions)
 int main() {
 	mapInit();
 	updatePiece(0);
 	printMap();
+	thread(updatePos).detach();
 	while(true) {
 		mapInit();
-		updatePos();
-		printMap();
 		pieceValue = initPiece();
-		updatePiece(0);
-		sleep_for(1s);
+		updatePiece(1);
+		printMap();
 	}
 	return 0;
 }
