@@ -4,15 +4,17 @@
 #include <string>
 using namespace std;
 
-#include <mutex> // mutes threads so my map doesnt break
-mutex mapMutex;
-
 // time/sleep_for() stuff
 #include <chrono>
 #include <thread>
 using namespace std::this_thread;
 using namespace std::chrono_literals;
 using std::chrono::system_clock;
+
+//multithreading stuff so everything doesnt break
+#include <thread>
+#include <mutex>
+mutex mtx;
 
 // piece position (each individual squares, there's 4 squares per piece)
 int pieceX[4] = {10, 11, 12, 13};
@@ -105,6 +107,7 @@ void printMap(){
 
 //updates player position within map
 void updatePiece(int init) {
+	lock_guard<mutex> lock(mtx);
 	for(int i = 0; i < 4; i++) {
 		newpieceX[i] = pieceX[i];
 		newpieceY[i] = pieceY[i];
@@ -116,6 +119,9 @@ void updatePiece(int init) {
 		}
 	}
 	else {
+		while(true) {
+			mapInit();
+			pieceValue = initPiece();
 		if (wasd != '~') system("stty raw"); 
 		wasd = getchar(); 
 		switch(wasd) {
@@ -176,10 +182,12 @@ void updatePiece(int init) {
 		}
 		collisionCheck = 0;
 		system("stty cooked");
+		}
 	}
 }
 
 void updatePos() {
+	lock_guard<mutex> lock(mtx);
 	int collisionCheck_delay;
 	while(true) {
 	for(int i = 0; i < 4; i++) {
@@ -193,14 +201,14 @@ void updatePos() {
 	}
 	if (collisionCheck_delay == 4) {
 		for(int i = 0; i < 4; i++) {
+			map[pieceY[i]][pieceX[i]] = '.';
 			pieceY[i] = newpieceY_delay[i];
 			map[pieceY[i]][pieceX[i]] = '@';
-			printMap();
 		}
 	}
 	collisionCheck_delay = 0;
-	//printMap();
 	sleep_for(1s);
+	printMap();
 	}
 }
 
@@ -212,11 +220,6 @@ int main() {
 	updatePiece(0);
 	printMap();
 	thread(updatePos).detach();
-	while(true) {
-		mapInit();
-		pieceValue = initPiece();
-		updatePiece(1);
-		printMap();
-	}
+	updatePiece(1);
 	return 0;
 }
