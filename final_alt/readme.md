@@ -13,9 +13,9 @@ literally just tetris lol
 - ~~add piece movement~~
 - ~~add gravity~~
 - ~~add rotation~~
-- add line clears
+- ~~add line clears~~
 - add topout logic
-- add score/levels
+-~~ add score/levels~~
 - add next piece display (right of board)
 - add controls display (below board)
 - clean up the code to be readable LOL
