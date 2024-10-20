@@ -344,7 +344,7 @@ void updatePos() {
 
 // main ui function (literally just executes all the other functions)
 int main() {
-	//system("gsettings set org.gnome.desktop.interface monospace-font-name 'Crisp 12'");
+	system("gsettings set org.gnome.desktop.interface monospace-font-name 'Crisp 12'");
 	mapInit();
 	updatePiece(0);
 	

@@ -18,4 +18,5 @@ literally just tetris lol
 - add score/levels
 - add next piece display (right of board)
 - add controls display (below board)
+- clean up the code to be readable LOL
 - optimize (im not gonna do this part)
