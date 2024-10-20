@@ -4,17 +4,15 @@
 #include <string>
 using namespace std;
 
+#include <mutex> // mutes threads so my map doesnt break
+mutex mtx;
+
 // time/sleep_for() stuff
 #include <chrono>
 #include <thread>
 using namespace std::this_thread;
 using namespace std::chrono_literals;
 using std::chrono::system_clock;
-
-//multithreading stuff so everything doesnt break
-#include <thread>
-#include <mutex>
-mutex mtx;
 
 // piece position (each individual squares, there's 4 squares per piece)
 int pieceX[4] = {10, 11, 12, 13};
@@ -35,6 +33,7 @@ char wasd;
 
 //initializes map
 void mapInit() {
+	lock_guard<mutex> lock(mtx);
 	for(int y = 0; y < mapY; y++){ //for each mapY value
 		for(int x = 0; x < mapX; x++){ // and then each mapX value
 				if (x == mapX - 1 || x == 0) { // if x value is 0 or 99, set border
@@ -43,14 +42,14 @@ void mapInit() {
 				else if (y == mapY - 1 || y == 0) { // if y value is 0 or 99, set border
 					map[y][x] = '#';
 				}
-				else {
-					map[y][x] = '.';
+				else if (map[y][x] != '#') {
+					map[y][x] = ' ';
 				}
 		}
 	}
 }
 
-//initializes next piece w/ "random" number generator
+//assigns next piece w/ "random" number generator
 int initPiece() {
 	auto time = system_clock::now().time_since_epoch() / 1ns;
 	cout << time << endl;
@@ -61,32 +60,27 @@ int initPiece() {
     	cout << time << endl;
     	time %= 7;
     	switch(abs(time)) {
-    		case 0:
-    			cout << "T piece" << endl;
+    		case 0: // i piece (cyan)
     			return 0;
     		break;
-    		case 1:
-    			cout << "L piece" << endl;
+    		case 1: // L piece (blue)
+    			pieceValue = 2;
     			return 1;
     		break;
-    		case 2:
-    			cout << "I piece" << std::endl;
+    		case 2: // T piece (purple)
+    			pieceValue = 2;
     			return 2;
     		break;
-    		case 3:
-    			cout << "J piece" << endl;
+    		case 3: // J piece (orange)
     			return 3;
     		break;
-    		case 4:
-    			cout << "Z piece" << endl;
+    		case 4: // Z piece (green/lime)
     			return 4;
     		break;
-    		case 5:
-    			cout << "R piece" << endl;
+    		case 5: // R piece (red)
     			return 5;
     		break;
-    		case 6:
-    			cout << "square piece" << endl;
+    		case 6: // square piece (yellow)
     			return 6;
     		break;
     		
@@ -96,37 +90,54 @@ int initPiece() {
 
 //clears console and prints new map
 void printMap(){
+	lock_guard<mutex> lock(mtx);
+	string out;
 	system("clear");
+	string color;
 	for(int y = 0; y < mapY; y++){ //for each mapX value
 		for(int x = 0; x < mapX; x++){ // and then each mapY value
-			if (x == mapX - 1) cout << map[y][x] << endl;
-			else cout << map[y][x];
+			color = map[y][x];
+			if (map[y][x] == '#') out = "\033[107m" + color + "\033[0m";
+			else if (map[y][x] == ' ') out = "\033[100m" + color + "\033[0m";
+			else out = "\033[146m" + color + "\033[0m";
+			if (x == mapX - 1) cout << out << endl;
+			else cout << out;
 		}
+	}
+}
+void rotatePiece() {
+	
+}
+
+void spawnNewPiece() {
+	int newpieceX_spawn[4] = {10, 11, 12, 13};
+	int newpieceY_spawn[4] = {2, 2, 2, 2};
+	for(int i = 0; i < 4; i++) {
+		pieceX[i] = newpieceX_spawn[i];
+		pieceY[i] = newpieceY_spawn[i];
 	}
 }
 
 //updates player position within map
 void updatePiece(int init) {
-	lock_guard<mutex> lock(mtx);
-	for(int i = 0; i < 4; i++) {
-		newpieceX[i] = pieceX[i];
-		newpieceY[i] = pieceY[i];
-	}
-	
 	if (init == 0) {
 		for(int i = 0; i < 4; i++) {
 		map[pieceY[i]][pieceX[i]] = '@';
 		}
+		system("stty cooked");
+		printMap();
+		system("stty raw");
 	}
 	else {
-		while(true) {
-			mapInit();
-			pieceValue = initPiece();
-		if (wasd != '~') system("stty raw"); 
+	while(true) {
+		for(int i = 0; i < 4; i++) {
+			newpieceX[i] = pieceX[i];
+			newpieceY[i] = pieceY[i];
+		}
 		wasd = getchar(); 
 		switch(wasd) {
 			case 'w': 
-				
+				exit(1);
 			break;
 			case 'a': 
 				for(int i = 0; i < 4; i++) {
@@ -136,12 +147,16 @@ void updatePiece(int init) {
 					}
 				}
 				if (collisionCheck == 4) {
+					mapInit();
 					for(int i = 0; i < 4; i++) {
 						pieceX[i] = newpieceX[i];
 						pieceY[i] = newpieceY[i];
 						map[pieceY[i]][pieceX[i]] = '@';
-						printMap();
+						
 					}
+					system("stty cooked");
+					printMap();
+					system("stty raw");
 				}
 			break;	
 			case 's': 
@@ -152,12 +167,15 @@ void updatePiece(int init) {
 					}
 				}
 				if (collisionCheck == 4) {
+					mapInit();
 					for(int i = 0; i < 4; i++) {
 						pieceX[i] = newpieceX[i];
 						pieceY[i] = newpieceY[i];
 						map[pieceY[i]][pieceX[i]] = '@';
-						printMap();
 					}
+					system("stty cooked");
+					printMap();
+					system("stty raw");
 				}
 			break;
 			case 'd': 
@@ -168,47 +186,60 @@ void updatePiece(int init) {
 					}
 				}
 				if (collisionCheck == 4) {
+					mapInit();
 					for(int i = 0; i < 4; i++) {
+						mapInit();
 						pieceX[i] = newpieceX[i];
 						pieceY[i] = newpieceY[i];
 						map[pieceY[i]][pieceX[i]] = '@';
-						printMap();
 					}
+					system("stty cooked");
+					printMap();
+					system("stty raw");
 				}
 			break;
 			case '~':
-			system("stty cooked");
+				exit(1);
 			break;
 		}
 		collisionCheck = 0;
 		system("stty cooked");
-		}
+	}
 	}
 }
 
 void updatePos() {
-	lock_guard<mutex> lock(mtx);
 	int collisionCheck_delay;
 	while(true) {
+	sleep_for(1s);
 	for(int i = 0; i < 4; i++) {
-		newpieceY_delay[i] = pieceY[i];
+		newpieceY[i] = pieceY[i];
 	}
 	for(int i = 0; i < 4; i++) {
-		newpieceY_delay[i]++;
-		if (map[newpieceY_delay[i]][pieceX[i]] != '#') { 
+		newpieceY[i]++;
+		if (map[newpieceY[i]][pieceX[i]] != '#') { 
 			collisionCheck_delay++;
 		}
+		else collisionCheck_delay--;
 	}
-	if (collisionCheck_delay == 4) {
+	if (collisionCheck_delay >= 4) {
+		mapInit();
 		for(int i = 0; i < 4; i++) {
-			map[pieceY[i]][pieceX[i]] = '.';
-			pieceY[i] = newpieceY_delay[i];
+			pieceY[i] = newpieceY[i];
 			map[pieceY[i]][pieceX[i]] = '@';
 		}
+		system("stty cooked");
+		printMap();
+		system("stty raw");
+	}
+	else {
+		pieceValue = initPiece();
+		for(int i = 0; i < 4; i++) {
+			map[pieceY[i]][pieceX[i]] = '#';
+		}
+		spawnNewPiece();
 	}
 	collisionCheck_delay = 0;
-	sleep_for(1s);
-	printMap();
 	}
 }
 
@@ -218,7 +249,6 @@ void updatePos() {
 int main() {
 	mapInit();
 	updatePiece(0);
-	printMap();
 	thread(updatePos).detach();
 	updatePiece(1);
 	return 0;
