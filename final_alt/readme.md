@@ -6,8 +6,9 @@ literally just tetris lol
 
 - add pieces 
 - add color codes for each piece
-- add collision (**done**)
-- add piece movement (**done**)
+- --add collision--
+- --add piece movement--
+- --add gravity--
 - add rotation
 - add line clears
 - add topout logic
