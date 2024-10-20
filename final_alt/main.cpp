@@ -15,42 +15,47 @@ using namespace std::chrono_literals;
 using std::chrono::system_clock;
 
 // piece position (each individual squares, there's 4 squares per piece)
-int pieceX[4] = {10, 11, 12, 13};
-int pieceY[4] = {2, 2, 2, 2};
-int newpieceX[4];
-int newpieceY[4];
-int newpieceY_delay[4];
+int pieceX[4] = {4, 5, 6, 7};
+int pieceY[4] = {1, 1, 1, 1};
+int newpieceX_spawn[4] = {4, 5, 6, 7};
+int newpieceY_spawn[4] = {1, 1, 1, 1};
+int newpieceX_spawn_copy[4] = {4, 5, 6, 7};
+int newpieceY_spawn_copy[4] = {1, 1, 1, 1};
+int newpieceX[4], newpieceY[4], newpieceY_delay[4];
 int pieceValue = 0;
 int collisionCheck;
 
 // map values
-const int mapX = 25;
-const int mapY = 25;
+const int mapX = 12;
+const int mapY = 22;
 char map[mapY][mapX];
-int topOut = 0;
+int color[mapY][mapX];
+bool topOut = false;
 char wasd;
 
 
 //initializes map
 void mapInit() {
-	lock_guard<mutex> lock(mtx);
 	for(int y = 0; y < mapY; y++){ //for each mapY value
 		for(int x = 0; x < mapX; x++){ // and then each mapX value
 				if (x == mapX - 1 || x == 0) { // if x value is 0 or 99, set border
 					map[y][x] = '#';
+					color[y][x] = 7;
 				}
 				else if (y == mapY - 1 || y == 0) { // if y value is 0 or 99, set border
 					map[y][x] = '#';
+					color[y][x] = 7;
 				}
 				else if (map[y][x] != '#') {
 					map[y][x] = ' ';
+					color[y][x] = 8;
 				}
 		}
 	}
 }
 
 //assigns next piece w/ "random" number generator
-int initPiece() {
+void initPiece() {
 	auto time = system_clock::now().time_since_epoch() / 1ns;
 	cout << time << endl;
 	time ^= time << 13;
@@ -59,33 +64,41 @@ int initPiece() {
     	time ^= time << 9;
     	cout << time << endl;
     	time %= 7;
-    	switch(abs(time)) {
-    		case 0: // i piece (cyan)
-    			return 0;
-    		break;
-    		case 1: // L piece (blue)
-    			pieceValue = 2;
-    			return 1;
+	pieceValue = abs(time);
+}
+
+void checkColor(int a, char b) {
+	string c = string(&b, &b + 1);
+	switch (a) { // check color number
+		case 0: // I piece (cyan)
+			cout << "\033[106m" + c + "\033[0m";
+		break;
+		case 1: // L piece (blue)
+   			cout << "\033[44m" + c + "\033[0m";
     		break;
     		case 2: // T piece (purple)
-    			pieceValue = 2;
-    			return 2;
+    			cout << "\033[45m" + c + "\033[0m";
     		break;
     		case 3: // J piece (orange)
-    			return 3;
+    			cout << "\033[43m" + c + "\033[0m";
     		break;
     		case 4: // Z piece (green/lime)
-    			return 4;
+    			cout << "\033[102m" + c + "\033[0m";
     		break;
     		case 5: // R piece (red)
-    			return 5;
+    			cout << "\033[41m" + c + "\033[0m";
     		break;
     		case 6: // square piece (yellow)
-    			return 6;
+    			cout << "\033[103m" + c + "\033[0m";
     		break;
-    		
-    	}
-	return 0;
+		case 7: // white
+			cout << "\033[107m" + c + "\033[0m";
+		break;
+		case 8: // gray
+			cout << "\033[100m" + c + "\033[0m";
+		break;
+		default: cerr << "error" << endl;
+	}
 }
 
 //clears console and prints new map
@@ -93,51 +106,132 @@ void printMap(){
 	lock_guard<mutex> lock(mtx);
 	string out;
 	system("clear");
-	string color;
+	system("stty cooked");
+	cout << pieceValue << endl;
 	for(int y = 0; y < mapY; y++){ //for each mapX value
 		for(int x = 0; x < mapX; x++){ // and then each mapY value
-			color = map[y][x];
-			if (map[y][x] == '#') out = "\033[107m" + color + "\033[0m";
-			else if (map[y][x] == ' ') out = "\033[100m" + color + "\033[0m";
-			else out = "\033[146m" + color + "\033[0m";
-			if (x == mapX - 1) cout << out << endl;
-			else cout << out;
+			checkColor(color[y][x], map[y][x]);
+			if (x == mapX - 1) cout << "\033[0m" << endl;
 		}
 	}
+	system("stty raw");
 }
-void rotatePiece() {
-	
+
+void rotatePiece(bool clockwise) {
+	int collisionCheck_rotation = 0;
+	int pivotX = pieceX[1]; 
+	int pivotY = pieceY[1];
+	int newpieceX_rotation[4];
+	int newpieceY_rotation[4];
+
+	for (int i = 0; i < 4; i++) {
+		if (clockwise) {
+            		newpieceX_rotation[i] = pivotX - (pieceY[i] - pivotY);
+            		newpieceY_rotation[i] = pivotY + (pieceX[i] - pivotX);
+        	} else {
+            		newpieceX_rotation[i] = pivotX + (pieceY[i] - pivotY);
+            		newpieceY_rotation[i] = pivotY - (pieceX[i] - pivotX);
+        	}
+    	}
+		
+	bool validRotation = true;
+	for (int i = 0; i < 4; i++) {
+		if (map[newpieceY_rotation[i]][newpieceX_rotation[i]] != '#') {
+			collisionCheck_rotation++;
+		}
+	}
+
+	if (collisionCheck_rotation >= 4) {
+		for (int i = 0; i < 4; i++) {
+            		pieceX[i] = newpieceX_rotation[i];
+           		pieceY[i] = newpieceY_rotation[i];
+        	}
+   	}
+	//}
 }
 
 void spawnNewPiece() {
-	int newpieceX_spawn[4] = {10, 11, 12, 13};
-	int newpieceY_spawn[4] = {2, 2, 2, 2};
-	for(int i = 0; i < 4; i++) {
+	lock_guard<mutex> lock(mtx);
+	switch(pieceValue) { // dont need i piece since its default 
+		case 1: // L piece (blue)
+   			newpieceX_spawn[0]++;
+			newpieceY_spawn[0]++;
+    		break;
+    		case 2: // T piece (purple)
+    			newpieceX_spawn[0]++;
+    			newpieceX_spawn[2]--;
+    			newpieceX_spawn[3]--;
+    			newpieceY_spawn[1]++;
+    			newpieceY_spawn[2] += 2;
+    			newpieceY_spawn[3]++;
+    		break;
+    		case 3: // J piece (orange)
+    			newpieceX_spawn[3]--;
+    			newpieceY_spawn[3]++;
+    		break;
+    		case 4: // Z piece (green/lime)
+    			newpieceX_spawn[2]--;
+    			newpieceX_spawn[3]--;
+    			newpieceY_spawn[0]++;
+    			newpieceY_spawn[1]++;
+    		break;
+    		case 5: // R piece (red)
+    			newpieceX_spawn[2]--;
+    			newpieceX_spawn[3]--;
+    			newpieceY_spawn[2]++;
+    			newpieceY_spawn[3]++;
+    		break;
+    		case 6: // square piece (yellow)
+    			newpieceX_spawn[0]++;
+    			newpieceX_spawn[3]--;
+    			newpieceY_spawn[1]++;
+    			newpieceY_spawn[3]++;
+    		break;
+    		default: cerr << "error" << endl;
+    	}
+   	for(int i = 0; i < 4; i++) {
 		pieceX[i] = newpieceX_spawn[i];
 		pieceY[i] = newpieceY_spawn[i];
+		newpieceY[i] = pieceY[i];
+		newpieceX[i] = pieceX[i];		
+		newpieceY_spawn[i] = newpieceY_spawn_copy[i];
+		newpieceX_spawn[i] = newpieceX_spawn_copy[i];
+		color[pieceY[i]][pieceX[i]] = pieceValue;
 	}
+	//mapInit();
 }
 
 //updates player position within map
 void updatePiece(int init) {
 	if (init == 0) {
-		for(int i = 0; i < 4; i++) {
-		map[pieceY[i]][pieceX[i]] = '@';
+		{
+			lock_guard<mutex> lock(mtx);
+			for(int i = 0; i < 4; i++) {
+				map[pieceY[i]][pieceX[i]] = '@';
+				color[pieceY[i]][pieceX[i]] = pieceValue;
+			}
 		}
-		system("stty cooked");
 		printMap();
-		system("stty raw");
 	}
 	else {
 	while(true) {
-		for(int i = 0; i < 4; i++) {
-			newpieceX[i] = pieceX[i];
-			newpieceY[i] = pieceY[i];
+		system("stty raw");
+		{
+			lock_guard<mutex> lock(mtx);
+			for(int i = 0; i < 4; i++) {
+				newpieceX[i] = pieceX[i];
+				newpieceY[i] = pieceY[i];
+			}
 		}
 		wasd = getchar(); 
 		switch(wasd) {
 			case 'w': 
-				exit(1);
+				rotatePiece(true);
+				printMap();
+			break;
+			case 'e': 
+				rotatePiece(false);
+				printMap();
 			break;
 			case 'a': 
 				for(int i = 0; i < 4; i++) {
@@ -147,18 +241,17 @@ void updatePiece(int init) {
 					}
 				}
 				if (collisionCheck == 4) {
-					mapInit();
-					for(int i = 0; i < 4; i++) {
-						pieceX[i] = newpieceX[i];
-						pieceY[i] = newpieceY[i];
-						map[pieceY[i]][pieceX[i]] = '@';
-						
+						//lock_guard<mutex> lock(mtx);
+						mapInit();
+						for(int i = 0; i < 4; i++) {
+							pieceX[i] = newpieceX[i];
+							pieceY[i] = newpieceY[i];
+							map[pieceY[i]][pieceX[i]] = '@';
+							color[pieceY[i]][pieceX[i]] = pieceValue;
+						}
+						printMap();
 					}
-					system("stty cooked");
-					printMap();
-					system("stty raw");
-				}
-			break;	
+			break;
 			case 's': 
 				for(int i = 0; i < 4; i++) {
 					newpieceY[i]++;
@@ -167,16 +260,16 @@ void updatePiece(int init) {
 					}
 				}
 				if (collisionCheck == 4) {
-					mapInit();
-					for(int i = 0; i < 4; i++) {
-						pieceX[i] = newpieceX[i];
-						pieceY[i] = newpieceY[i];
-						map[pieceY[i]][pieceX[i]] = '@';
+						//lock_guard<mutex> lock(mtx);
+						mapInit();
+						for(int i = 0; i < 4; i++) {
+							pieceX[i] = newpieceX[i];
+							pieceY[i] = newpieceY[i];
+							map[pieceY[i]][pieceX[i]] = '@';
+							color[pieceY[i]][pieceX[i]] = pieceValue;
+						}
+						printMap();
 					}
-					system("stty cooked");
-					printMap();
-					system("stty raw");
-				}
 			break;
 			case 'd': 
 				for(int i = 0; i < 4; i++) {
@@ -186,16 +279,15 @@ void updatePiece(int init) {
 					}
 				}
 				if (collisionCheck == 4) {
+					//lock_guard<mutex> lock(mtx);
 					mapInit();
 					for(int i = 0; i < 4; i++) {
-						mapInit();
 						pieceX[i] = newpieceX[i];
 						pieceY[i] = newpieceY[i];
 						map[pieceY[i]][pieceX[i]] = '@';
+						color[pieceY[i]][pieceX[i]] = pieceValue;
 					}
-					system("stty cooked");
 					printMap();
-					system("stty raw");
 				}
 			break;
 			case '~':
@@ -211,7 +303,8 @@ void updatePiece(int init) {
 void updatePos() {
 	int collisionCheck_delay;
 	while(true) {
-	sleep_for(1s);
+	{
+	lock_guard<mutex> lock(mtx);
 	for(int i = 0; i < 4; i++) {
 		newpieceY[i] = pieceY[i];
 	}
@@ -222,24 +315,28 @@ void updatePos() {
 		}
 		else collisionCheck_delay--;
 	}
+	}
 	if (collisionCheck_delay >= 4) {
 		mapInit();
+		{
+		lock_guard<mutex> lock(mtx);
 		for(int i = 0; i < 4; i++) {
 			pieceY[i] = newpieceY[i];
 			map[pieceY[i]][pieceX[i]] = '@';
+			color[pieceY[i]][pieceX[i]] = pieceValue;
 		}
-		system("stty cooked");
+		}
 		printMap();
-		system("stty raw");
 	}
 	else {
-		pieceValue = initPiece();
+		initPiece();
 		for(int i = 0; i < 4; i++) {
 			map[pieceY[i]][pieceX[i]] = '#';
 		}
 		spawnNewPiece();
 	}
 	collisionCheck_delay = 0;
+	sleep_for(1s);
 	}
 }
 
@@ -247,9 +344,14 @@ void updatePos() {
 
 // main ui function (literally just executes all the other functions)
 int main() {
+	//system("gsettings set org.gnome.desktop.interface monospace-font-name 'Crisp 12'");
 	mapInit();
 	updatePiece(0);
-	thread(updatePos).detach();
-	updatePiece(1);
+	
+	thread t1(updatePos);
+	thread t2(updatePiece, 1);
+	
+	t1.join();
+	t2.join();
 	return 0;
 }

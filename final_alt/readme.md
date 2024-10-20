@@ -2,6 +2,9 @@
 
 literally just tetris lol
 
+# **TO RESET FONT**
+- sh resetFont.txt
+
 # todo:
 
 - add pieces 
