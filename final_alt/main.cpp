@@ -26,6 +26,7 @@ int pieceValue = 0;
 int collisionCheck;
 
 // map values
+int score = 0;
 const int mapX = 12;
 const int mapY = 22;
 char map[mapY][mapX];
@@ -114,6 +115,7 @@ void printMap(){
 			if (x == mapX - 1) cout << "\033[0m" << endl;
 		}
 	}
+	cout << "Score: " << score << endl;
 	system("stty raw");
 }
 
@@ -151,7 +153,7 @@ void rotatePiece(bool clockwise) {
 }
 
 void spawnNewPiece() {
-	lock_guard<mutex> lock(mtx);
+	//lock_guard<mutex> lock(mtx);
 	switch(pieceValue) { // dont need i piece since its default 
 		case 1: // L piece (blue)
    			newpieceX_spawn[0]++;
@@ -300,6 +302,47 @@ void updatePiece(int init) {
 	}
 }
 
+void lineClear() {
+	int collisionCheck_clear = 0;
+	int lineClears = 0;
+	for(int y = 0; y < mapY; y++){ //for each mapY value
+		for(int x = 0; x < mapX; x++){ // and then each mapX value
+			if (map[y][x]  ==  '#' && y != 0 && y != mapY - 1) collisionCheck_clear++;
+		}
+		if (collisionCheck_clear == mapX) {
+			lineClears++;
+			for (int row = y; row > 1; row--) {
+			for (int col = 1; col < mapX - 1; col++) {
+                    		map[row][col] = map[row - 1][col]; 
+                    		color[row][col] = color[row - 1][col];  
+                }
+            }
+
+            for (int col = 1; col < mapX - 1; col++) {
+                map[1][col] = ' ';  
+                color[1][col] = 8;  
+            }
+		}
+		collisionCheck_clear = 0;
+	}
+	switch (lineClears) {
+		case 1:
+			score += 40;
+		break;
+		case 2:
+			score += 100;
+		break;
+		case 3:
+			score += 300;
+		break;
+		case 4:
+			score += 1200;
+		break;
+		
+	}
+	
+}
+
 void updatePos() {
 	int collisionCheck_delay;
 	while(true) {
@@ -333,6 +376,7 @@ void updatePos() {
 		for(int i = 0; i < 4; i++) {
 			map[pieceY[i]][pieceX[i]] = '#';
 		}
+		lineClear();
 		spawnNewPiece();
 	}
 	collisionCheck_delay = 0;
