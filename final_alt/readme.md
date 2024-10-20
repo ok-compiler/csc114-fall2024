@@ -7,12 +7,15 @@ literally just tetris lol
 
 # todo:
 
-- add pieces 
-- add color codes for each piece
+- ~~add pieces~~ 
+- ~~add color codes for each piece~~
 - ~~add collision~~
 - ~~add piece movement~~
 - ~~add gravity~~
-- add rotation
+- ~~add rotation~~
 - add line clears
 - add topout logic
+- add score/levels
+- add next piece display (right of board)
+- add controls display (below board)
 - optimize (im not gonna do this part)
