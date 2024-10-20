@@ -4,9 +4,11 @@ literally just tetris lol
 
 # todo:
 
-- add pieces and corresponding collision
-- add piece movement/rotation
-- add line clears
+- add pieces 
 - add color codes for each piece
-- add topout logic idk
-- fix bugs and whatnot so it actually works
+- add collision (**done**)
+- add piece movement (**done**)
+- add rotation
+- add line clears
+- add topout logic
+- optimize (im not gonna do this part)
