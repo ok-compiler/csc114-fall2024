@@ -17,7 +17,7 @@ This doc and project is a huge huge WIP so some information provided below may n
 - ~~add rotation~~
 - ~~add line clears~~
 - add topout logic
--~~ add score/levels~~
+- ~~ add score/levels~~
 - add next piece display (right of board)
 - add controls display (below board)
 - clean up the code to be readable LOL
@@ -73,7 +73,7 @@ This doc and project is a huge huge WIP so some information provided below may n
   * Initializes map
   * 2 for loops with both the X and Y values of 2D map array
   * If value is a border, set to #
-  * If not and there __isn't__ a #, set to an empty space (‘ ‘)
+  * If not and there **isn't** a #, set to an empty space (‘ ‘)
 
 ## printMap()
 
@@ -89,9 +89,11 @@ This doc and project is a huge huge WIP so some information provided below may n
 ## initPiece()
 
 * Initializes piece
-* Uses xor shifting to create “random” number from current time
-* Takes “random” value and mods by 7 to get random number between 0 and 6
-* Returns the random value
+* Creates random number between 0 and 6, assigns that value to nextPiece int
+* if the value is in the "piece bank", initialize new piece (loop until success)
+* if pieceBank array is full, reset array
+ * this gives makes sure **all** pieces are generated per 7 cycles
+  * same random generation as all new tetris games
 
 ## spawnNewPiece() 
 * Spawns new piece at top and center using ```pieceValue``` to determine which piece spawns
