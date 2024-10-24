@@ -33,33 +33,33 @@ void mapInit() {
 }
 
 void checkColor(int a, char b) {
-    std::string c = std::string(&b, &b + 1);
+    string c = string(&b, &b + 1);
     switch (a) {
-        case 0: std::cout << "\033[106m" + c + "\033[0m"; break;
-        case 1: std::cout << "\033[44m" + c + "\033[0m"; break;
-        case 2: std::cout << "\033[45m" + c + "\033[0m"; break;
-        case 3: std::cout << "\033[43m" + c + "\033[0m"; break;
-        case 4: std::cout << "\033[102m" + c + "\033[0m"; break;
-        case 5: std::cout << "\033[41m" + c + "\033[0m"; break;
-        case 6: std::cout << "\033[103m" + c + "\033[0m"; break;
-        case 7: std::cout << "\033[107m" + c + "\033[0m"; break;
-        case 8: std::cout << "\033[100m" + c + "\033[0m"; break;
-        default: std::cerr << "error" << std::endl;
+        case 0: cout << "\033[106m" + c + "\033[0m"; break;
+        case 1: cout << "\033[44m" + c + "\033[0m"; break;
+        case 2: cout << "\033[45m" + c + "\033[0m"; break;
+        case 3: cout << "\033[43m" + c + "\033[0m"; break;
+        case 4: cout << "\033[102m" + c + "\033[0m"; break;
+        case 5: cout << "\033[41m" + c + "\033[0m"; break;
+        case 6: cout << "\033[103m" + c + "\033[0m"; break;
+        case 7: cout << "\033[107m" + c + "\033[0m"; break;
+        case 8: cout << "\033[100m" + c + "\033[0m"; break;
+        default: cerr << "error" << endl;
     }
 }
 
 void printMap() {
-    std::lock_guard<std::mutex> lock(mtx);
+    lock_guard<mutex> lock(mtx);
     system("clear");
     system("stty cooked");
-    std::cout << pieceValue << std::endl;
     for (int y = 0; y < mapY; y++) {
         for (int x = 0; x < mapX; x++) {
             checkColor(color[y][x], map[y][x]);
-            if (x == mapX - 1) std::cout << "\033[0m" << std::endl;
+            if (x == mapX - 1) cout << "\033[0m" << endl;
         }
     }
-    std::cout << "Score: " << score << std::endl;
+    cout << "Score: " << score << endl;
+    cout << "next piece: " << nextPiece << endl;
     system("stty raw");
 }
 

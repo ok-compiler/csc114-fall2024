@@ -14,6 +14,7 @@ extern std::mutex mtx;
 extern int score;
 extern int pieceX[4], pieceY[4];
 extern int pieceValue;
+extern int nextPiece;
 extern char wasd;
 
 void mapInit();

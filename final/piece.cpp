@@ -19,21 +19,13 @@ int newpieceY_spawn[4] = {1, 1, 1, 1};
 int newpieceX_spawn_copy[4] = {4, 5, 6, 7};
 int newpieceY_spawn_copy[4] = {1, 1, 1, 1};
 int newpieceX[4], newpieceY[4];
+
 int pieceValue = 0;
+int nextPiece = 1;
+int pieceBank[7] = {0, -1, 2, 3, 4, 5, 6};
+bool spawnNew = true;
 int collisionCheck = 0;
 char wasd;
-
-void initPiece() {
-    auto time = chrono::system_clock::now().time_since_epoch() / 1ns;
-    cout << time << endl;
-    time ^= time << 13;
-    time ^= time >> 17;
-    time ^= time << 5;
-    time ^= time << 9;
-    cout << time << endl;
-    time %= 7;
-    pieceValue = abs(time);
-}
 
 void rotatePiece(bool clockwise) {
     int collisionCheck_rotation = 0;
@@ -66,7 +58,29 @@ void rotatePiece(bool clockwise) {
     }
 }
 
+void initPiece() {
+	while (spawnNew) {
+		nextPiece = rand() % 7; //new random int
+		if (nextPiece != pieceBank[nextPiece]) spawnNew = true; // if used, restart
+		else  {
+			spawnNew = false;
+			pieceBank[nextPiece] = -1;
+			for (int i = 0; i < 7; i++) {
+				if (pieceBank[i] != -1) break; //check if all slots are used
+				else if (i == 6) { // if they are, reset array
+					for (int i = 0; i < 7; i++) {
+						pieceBank[i] = i;
+					}
+				}
+			}	
+		}
+	}
+	spawnNew = true;
+}
+
 void spawnNewPiece() {
+	pieceValue = nextPiece;
+	initPiece();
 	//lock_guard<mutex> lock(mtx);
 	switch(pieceValue) { // dont need i piece since its default 
 		case 1: // L piece (blue)
@@ -114,7 +128,6 @@ void spawnNewPiece() {
 		newpieceX_spawn[i] = newpieceX_spawn_copy[i];
 		color[pieceY[i]][pieceX[i]] = pieceValue;
 	}
-	//mapInit();
 }
 
 void updatePiece(int init) {
@@ -215,7 +228,8 @@ void updatePiece(int init) {
 	}
 }
 
-void updatePos() {
+void updatePos() {	
+	srand(time(0));
 	int collisionCheck_delay;
 	while(true) {
 	{
@@ -244,13 +258,13 @@ void updatePos() {
 		printMap();
 	}
 	else {
-		initPiece();
 		for(int i = 0; i < 4; i++) {
 			map[pieceY[i]][pieceX[i]] = '#';
-			cout << "working" << endl;
 		}
 		lineClear();
 		spawnNewPiece();
+		printMap();
+		
 	}
 	collisionCheck_delay = 0;
 	sleep_for(1s);
