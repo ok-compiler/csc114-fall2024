@@ -17,10 +17,10 @@ This doc and project is a huge huge WIP so some information provided below may n
 - ~~add rotation~~
 - ~~add line clears~~
 - add topout logic
-- ~~ add score/levels~~
+- ~~add score/levels~~
 - add next piece display (right of board)
 - add controls display (below board)
-- clean up the code to be readable LOL
+- ~~clean up the code to be readable LOL~~ (kinda)
 - optimize (im not gonna do this part)
 
 # Objects:
