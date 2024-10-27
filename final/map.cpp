@@ -17,6 +17,16 @@ const int mapX = 12;
 const int mapY = 22;
 char map[mapY][mapX];
 int color[mapY][mapX];
+int nextPiecePrint[7][2][4] = { 
+{{'@', '@', '@', '@'}, {' ', ' ', ' ', ' '}}, // I piece
+{{'@', '@', '@', ' '}, {'@', ' ', ' ', ' '}}, // L piece
+{{'@', '@', '@', ' '}, {' ', '@', ' ', ' '}}, // T piece
+{{'@', '@', '@', ' '}, {' ', ' ', '@', ' '}}, // J piece
+{{'@', '@', ' ', ' '}, {' ', '@', '@', ' '}}, // Z piece
+{{' ', '@', '@', ' '}, {'@', '@', ' ', ' '}}, // R piece
+{{'@', '@', ' ', ' '}, {'@', '@', ' ', ' '}} // square piece
+};
+
 
 void mapInit() {
     for (int y = 0; y < mapY; y++) {
@@ -55,11 +65,31 @@ void printMap() {
     for (int y = 0; y < mapY; y++) {
         for (int x = 0; x < mapX; x++) {
             checkColor(color[y][x], map[y][x]);
-            if (x == mapX - 1) cout << "\033[0m" << endl;
-        }
+            if (x == mapX - 1) {
+            	switch (y){
+            		case 0: cout << "\tScore: " << score << endl; break;
+    	     		case 2:
+    	     	   		cout << "\tnext piece: ";
+        				for (int i = 0; i < 4; i++) {
+    	     	   				if (nextPiecePrint[nextPiece][0][i] == '@') checkColor(nextPiece, nextPiecePrint[nextPiece][0][i]);
+    	     	   				else cout << string(&nextPiecePrint[nextPiece][0][i], &nextPiecePrint[nextPiece][0][i] + 1);
+    	     	   			}
+    	     	   		cout << endl;
+    	     	   	break;
+    	     	   	case 3: 
+    	     	   		cout << "\t            ";
+    	     	   			for (int i = 0; i < 4; i++) {
+    	     	   				if (nextPiecePrint[nextPiece][1][i] == '@') checkColor(nextPiece, nextPiecePrint[nextPiece][1][i]);
+    	     	   				else cout << string(&nextPiecePrint[nextPiece][1][i], &nextPiecePrint[nextPiece][1][i] + 1);
+    	     	   			}
+    	     	   		cout  << endl;
+    	     	   	break;
+    	      	 	default: cout << endl; break;
+            	}
+            }
+    	}
     }
-    cout << "Score: " << score << endl;
-    cout << "next piece: " << nextPiece << endl;
+    //cout << "Controls:\n~: Quit\ta: move left\ts: move down\td: move right\tw: rotate clockwise\te: rotate counterclockwise";
     system("stty raw");
 }
 

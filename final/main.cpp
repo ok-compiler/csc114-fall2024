@@ -1,29 +1,20 @@
-#include "map.h"
 #include <iostream>
-#include <stdio.h> 
-#include <string>
 using namespace std;
-#include <mutex> 
-mutex mtx;
-
-#include <chrono>
-#include <thread>
-using namespace std::this_thread;
-using namespace std::chrono_literals;
-using std::chrono::system_clock;
-
 #include "map.h"
 #include "piece.h"
 #include "ui.h"
 
+#include <mutex> 
+mutex mtx;
+
 
 int main() {
-    system("gsettings set org.gnome.desktop.interface monospace-font-name 'Crisp 12'");
-    mapInit();
-    updatePiece(0);
+    system("gsettings set org.gnome.desktop.interface monospace-font-name 'Crisp 12'"); // set font to something more square
+    mapInit(); // initialize the map
+    updatePiece(0); // initialize the pieces
     
-    thread t1(updatePos);
-    thread t2(updatePiece, 1);
+    thread t1(updatePos); // gravity function | runs in separate thread to drop piece every second
+    thread t2(updatePiece, 1); // input function | runs in separate thread to take player input
     
     t1.join();
     t2.join();
