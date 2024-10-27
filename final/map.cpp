@@ -67,23 +67,59 @@ void printMap() {
             checkColor(color[y][x], map[y][x]);
             if (x == mapX - 1) {
             	switch (y){
-            		case 0: cout << "\tScore: " << score << endl; break;
-    	     		case 2:
-    	     	   		cout << "\tnext piece: ";
-        				for (int i = 0; i < 4; i++) {
-    	     	   				if (nextPiecePrint[nextPiece][0][i] == '@') checkColor(nextPiece, nextPiecePrint[nextPiece][0][i]);
-    	     	   				else cout << string(&nextPiecePrint[nextPiece][0][i], &nextPiecePrint[nextPiece][0][i] + 1);
-    	     	   			}
-    	     	   		cout << endl;
+            		case 0:
+            			for (int i = 0; i < 13; i++) {
+            				checkColor(7, '#');
+            			}
+            			cout << endl;
+            		break;
+            		case 1: 
+            			cout << "Score: " << score; 
+            			cout << "    ";
+    	     	   		checkColor(7, '#');
+    	     	   		cout  << endl;
+            		break;
+    	     		case 2: 
+    	     			cout << "next piece: ";
+    	     	 	  	checkColor(7, '#');
+    	     	   		cout  << endl; 
     	     	   	break;
-    	     	   	case 3: 
-    	     	   		cout << "\t            ";
-    	     	   			for (int i = 0; i < 4; i++) {
-    	     	   				if (nextPiecePrint[nextPiece][1][i] == '@') checkColor(nextPiece, nextPiecePrint[nextPiece][1][i]);
-    	     	   				else cout << string(&nextPiecePrint[nextPiece][1][i], &nextPiecePrint[nextPiece][1][i] + 1);
-    	     	   			}
+    	     	   	case 3:
+    	     	   		cout << "\t\t";
+    	     	   		checkColor(7, '#');
     	     	   		cout  << endl;
     	     	   	break;
+    	     	   	case 4: 
+    	     	   		cout << "\t";
+    	     	   		for (int i = 0; i < 4; i++) {
+    	     	   			if (nextPiecePrint[nextPiece][0][i] == '@') checkColor(nextPiece, nextPiecePrint[nextPiece][0][i]);
+    	     	  			else cout << string(&nextPiecePrint[nextPiece][0][i], &nextPiecePrint[nextPiece][0][i] + 1);
+    	     	   		}
+    	     	   		cout << "    ";
+    	     	   		checkColor(7, '#');
+    	     	   		cout << endl;
+    	     	   	break;
+    	     	   	case 5:
+    	     	   		cout << "\t";
+    	     	   		for (int i = 0; i < 4; i++) {
+    	     	   			if (nextPiecePrint[nextPiece][1][i] == '@') checkColor(nextPiece, nextPiecePrint[nextPiece][1][i]);
+    	     	   			else cout << string(&nextPiecePrint[nextPiece][1][i], &nextPiecePrint[nextPiece][1][i] + 1);
+    	     	   		}
+    	     	   		cout << "    ";
+    	     	   		checkColor(7, '#');
+    	     	   		cout  << endl;
+    	     	   	break;
+    	     	   	case 6:
+    	     	   		cout << "\t\t";
+    	     	   		checkColor(7, '#');
+    	     	   		cout  << endl;
+    	     	   	break;
+    	     	   	case 7:
+            			for (int i = 0; i < 13; i++) {
+            				checkColor(7, '#');
+            			}
+            			cout << endl;
+            		break;
     	      	 	default: cout << endl; break;
             	}
             }
