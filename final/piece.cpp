@@ -286,22 +286,22 @@ void updatePos() {
 	int collisionCheck_delay;
 	while(true) {
 	{
-	lock_guard<mutex> lock(mtx);
+	lock_guard<mutex> lock(mtx); // mutex so other threads dont interfere
 	for(int i = 0; i < 4; i++) {
 		newpieceY[i] = pieceY[i];
 	}
 	for(int i = 0; i < 4; i++) {
-		newpieceY[i]++;
+		newpieceY[i]++; //move piece down
 		if (map[newpieceY[i]][pieceX[i]] != '#') { 
 			collisionCheck_delay++;
 		}
 		else collisionCheck_delay--;
 	}
 	}
-	if (collisionCheck_delay >= 4) {
+	if (collisionCheck_delay >= 4) { // if collision good, proceed
 		mapInit();
 		{
-		lock_guard<mutex> lock(mtx);
+		lock_guard<mutex> lock(mtx); // mutex again so other threads dont interfere
 		for(int i = 0; i < 4; i++) {
 			pieceY[i] = newpieceY[i];
 			map[pieceY[i]][pieceX[i]] = '@';
@@ -323,8 +323,8 @@ void updatePos() {
 		printMap();
 		
 	}
-	collisionCheck_delay = 0;
-	sleep_for(500ms);
+	collisionCheck_delay = 0; // reset collision check
+	sleep_for(500ms); // wait half a second
 	}
 }
 

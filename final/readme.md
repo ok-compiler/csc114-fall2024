@@ -20,9 +20,9 @@ This doc and project is a huge huge WIP so some information provided below may n
 - ~~add score/levels~~
 - ~~add next piece display (right of board)~~
 - ~~add controls display~~
-- ~~clean up the code to be readable LOL~~ (kinda)
-- optimize (im not gonna do this part)
+- ~~clean up the code to be readable LOL~~
 - update readme with accurate info on functions/files
+- optimize (im not gonna do this part)
 
 # Objects:
 
