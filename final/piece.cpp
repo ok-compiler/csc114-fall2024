@@ -58,6 +58,29 @@ void rotatePiece(bool clockwise) {
     }
 }
 
+void gameOver() {
+	//system("clear");
+	system("stty cooked");
+	system("gsettings reset org.gnome.desktop.interface monospace-font-name");
+	cout << R"( ░▒▓██████▓▒░ ░▒▓██████▓▒░░▒▓██████████████▓▒░░▒▓████████▓▒░       ░▒▓██████▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓████████▓▒░▒▓███████▓▒░  )" << endl;
+	sleep_for(500ms);
+	cout << R"(░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░             ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░ )" << endl;
+	sleep_for(500ms);
+	cout << R"(░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░             ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒▒▓█▓▒░░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░ )" << endl;
+	sleep_for(500ms);
+	cout << R"(░▒▓█▓▒▒▓███▓▒░▒▓████████▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓██████▓▒░        ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒▒▓█▓▒░░▒▓██████▓▒░ ░▒▓███████▓▒░  )" << endl;
+	sleep_for(500ms);
+	cout << R"(░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░             ░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▓█▓▒░ ░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░ )" << endl;
+	sleep_for(500ms);
+	cout << R"(░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░             ░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▓█▓▒░ ░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░ )" << endl;
+	sleep_for(500ms);
+	cout << R"( ░▒▓██████▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓████████▓▒░       ░▒▓██████▓▒░   ░▒▓██▓▒░  ░▒▓████████▓▒░▒▓█▓▒░░▒▓█▓▒░ )" << endl;
+	sleep_for(500ms);
+	cout << "\nwomp womp lol" << endl;
+	sleep_for(1s);
+	system("stty cooked");
+}
+
 void initPiece() {
 	while (spawnNew) {
 		nextPiece = rand() % 7; //new random int
@@ -260,6 +283,10 @@ void updatePos() {
 	else {
 		for(int i = 0; i < 4; i++) {
 			map[pieceY[i]][pieceX[i]] = '#';
+			if (pieceY[i] == 1) {
+				gameOver(); // if topout, game over (womp womp)
+				exit(0);
+			}
 		}
 		lineClear();
 		spawnNewPiece();
