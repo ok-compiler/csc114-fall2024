@@ -82,8 +82,7 @@ void printMap() {
             			cout << endl;
             		break;
             		case 1: 
-            			cout << "Score: " << score; 
-            			cout << "    ";
+            			cout << "Score: " << score << "\t"; 
     	     	   		checkColor(7, '#');
     	     	   		cout  << endl;
             		break;
