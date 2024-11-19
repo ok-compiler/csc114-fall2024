@@ -1,3 +1,26 @@
+
+/*
+
+=============================================================
+Author : Owen Webster
+Class : csc 114
+Class Section : 401
+Date : 11/14/24
+Assignment : Final Exam
+Notes : in readme.md
+
+I wrote all the code submitted, and I have provided citations and references where appropriate.
+
+==============================================================
+
+Code adapted from:
+https://www.geeksforgeeks.org/multithreading-in-cpp/
+https://www.geeksforgeeks.org/header-files-in-c-cpp-and-its-uses/
+https://stackoverflow.com/a/912184
+==============================================================
+
+*/
+
 #include <iostream>
 using namespace std;
 #include "map.h"
