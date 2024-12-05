@@ -1,0 +1,5 @@
+# of gallons of paint required: 5
+hours of labor required: 33
+cost of the paint: $150
+labor charges: $825
+total cost: $975
